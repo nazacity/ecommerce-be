@@ -48,9 +48,9 @@ export class CustomerController {
     @Param('customerId', new ParseUUIDPipe()) customerId: string,
   ): Promise<ResponseModel<Customer>> {
     try {
-      const Customer = await this.customerService.getCustomerById(customerId)
+      const customer = await this.customerService.getCustomerById(customerId)
 
-      return { data: Customer }
+      return { data: customer }
     } catch (error) {
       throw new HttpException(
         {
@@ -66,9 +66,8 @@ export class CustomerController {
     @Body() customerCreateDto: CustomerCreateDto,
   ): Promise<ResponseModel<Customer>> {
     try {
-      const createCustomer = await this.customerService.createCustomer(
-        customerCreateDto,
-      )
+      const createCustomer =
+        await this.customerService.createCustomer(customerCreateDto)
 
       return { data: createCustomer }
     } catch (error) {
@@ -106,12 +105,12 @@ export class CustomerController {
 
   @Delete('/:customerId')
   async deleteCustomer(
-    @Param('customerId', new ParseUUIDPipe()) CustomerId: string,
+    @Param('customerId', new ParseUUIDPipe()) customerId: string,
   ): Promise<ResponseModel<string>> {
     try {
-      const deletedCustomer = await this.customerService.deleteCustomer(
-        CustomerId,
-      )
+      const deletedCustomer = await this.customerService.deleteCustomer({
+        customerId,
+      })
 
       if (deletedCustomer) {
         return { data: 'succeeded' }

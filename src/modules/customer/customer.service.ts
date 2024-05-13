@@ -9,8 +9,10 @@ import {
   CustomerUpdateQueryDto,
 } from './dto/customer.dto'
 import { paginationUtil } from 'src/utils/pagination'
+import { CustomerCreditService } from '../customer-credit/customer-credit.service'
+import { CartService } from '../cart/cart.service'
 
-const relations = []
+const relations = ['cart', 'credit']
 
 @Injectable()
 export class CustomerService {
@@ -18,6 +20,8 @@ export class CustomerService {
   constructor(
     @InjectRepository(Customer)
     private readonly customerRepository: Repository<Customer>,
+    private readonly customerCreditService: CustomerCreditService,
+    private readonly cartService: CartService,
   ) {}
 
   async getCustomers(query: CustomerUpdateQueryDto): Promise<{
@@ -81,8 +85,14 @@ export class CustomerService {
   ): Promise<Customer> {
     try {
       this.logger.log('create-customer')
+
+      const cart = await this.cartService.createCart()
+      const credit = await this.customerCreditService.createCustomerCredit()
+
       const createdCustomer = await this.customerRepository.create({
         ...customerCreateDto,
+        cart,
+        credit,
       })
 
       const savedCustomer = await this.customerRepository.save(createdCustomer)
@@ -114,7 +124,11 @@ export class CustomerService {
     }
   }
 
-  async deleteCustomer(customerId: string): Promise<boolean> {
+  async deleteCustomer({
+    customerId,
+  }: {
+    customerId: string
+  }): Promise<boolean> {
     try {
       this.logger.log('delete-customer')
       await this.customerRepository.update(customerId, {

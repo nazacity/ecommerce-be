@@ -1,5 +1,16 @@
+import { Cart } from 'src/modules/cart/entity/cart.entity'
+import { CustomerAddress } from 'src/modules/customer-address/entities/customer-address.entity'
+import { CustomerCredit } from 'src/modules/customer-credit/entities/customer-credit.entity'
+import { Order } from 'src/modules/order/entity/order.entity'
 import { GlobalEntity } from 'src/utils/global-entity'
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
 
 export enum CustomerStatus {
   'active' = 'active',
@@ -16,13 +27,13 @@ export class Customer extends GlobalEntity {
   @Column()
   lineId: string
 
-  @Column()
+  @Column({ nullable: true, default: '' })
   displayName: string
 
-  @Column()
+  @Column({ nullable: true, default: '' })
   firstName: string
 
-  @Column()
+  @Column({ nullable: true, default: '' })
   lastName: string
 
   @Column({ nullable: true, default: '' })
@@ -34,4 +45,30 @@ export class Customer extends GlobalEntity {
     enum: CustomerStatus,
   })
   status: CustomerStatus
+
+  @OneToOne(() => CustomerCredit, (customerCredit) => customerCredit.customer, {
+    createForeignKeyConstraints: true,
+  })
+  @JoinColumn()
+  credit: CustomerCredit
+
+  @OneToOne(() => Cart, (cart) => cart.customer, {
+    createForeignKeyConstraints: true,
+  })
+  @JoinColumn()
+  cart: Cart
+
+  @OneToMany(
+    () => CustomerAddress,
+    (customerAddress) => customerAddress.customer,
+    {
+      createForeignKeyConstraints: false,
+    },
+  )
+  addresses: CustomerAddress[]
+
+  @OneToMany(() => Order, (order) => order.customer, {
+    createForeignKeyConstraints: false,
+  })
+  orders: Order[]
 }

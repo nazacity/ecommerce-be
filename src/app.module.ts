@@ -16,6 +16,18 @@ import { AuthModule } from './modules/auth/auth.module'
 import { CustomerModule } from './modules/customer/customer.module'
 import { AdminModule } from './modules/admin/admin.module'
 import { R2Module } from './modules/r2/r2.module'
+import { ProductModule } from './modules/product/product.module'
+import { ProductOptionModule } from './modules/product-option/product-option.module'
+import { ProductOptionDiscountModule } from './modules/product-option-discount/product-option-discount.module'
+import { CartModule } from './modules/cart/cart.module'
+import { CartItemModule } from './modules/cart-item/cart-item.module'
+import { OrderModule } from './modules/order/order.module'
+import { OrderItemModule } from './modules/order-item/order-item.module'
+import { CustomerAddressModule } from './modules/customer-address/customer-address.module'
+import { CustomerCreditModule } from './modules/customer-credit/customer-credit.module'
+import { CustomerCreditHistoryModule } from './modules/customer-credit-history/customer-credit-history.module'
+import { ProductCategoryModule } from './modules/product-category/product-category.module'
+import { ProductImageModule } from './modules/product-image/product-image.module';
 
 // Scheduler
 
@@ -67,6 +79,18 @@ import { R2Module } from './modules/r2/r2.module'
     CustomerModule,
     AdminModule,
     R2Module,
+    ProductModule,
+    ProductCategoryModule,
+    ProductOptionModule,
+    ProductOptionDiscountModule,
+    CartModule,
+    CartItemModule,
+    OrderModule,
+    OrderItemModule,
+    CustomerAddressModule,
+    CustomerCreditModule,
+    CustomerCreditHistoryModule,
+    ProductImageModule,
   ],
   providers: [
     {
