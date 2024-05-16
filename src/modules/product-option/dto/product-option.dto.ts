@@ -3,5 +3,6 @@ import { ProductOptionDiscountDto } from 'src/modules/product-option-discount/dt
 export class ProductOptionDto {
   label: string
   price: number
+  cost: number
   discounts: ProductOptionDiscountDto[]
 }

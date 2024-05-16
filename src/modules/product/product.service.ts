@@ -35,10 +35,13 @@ export class ProductService {
       const { take, skip } = paginationUtil(query)
       const [products, total] = await this.productRepository.findAndCount({
         where: {
-          categories: {
-            id: In(query.categoriesId),
-            isDeleted: false,
-          },
+          ...(query.categoriesId &&
+            query.categoriesId.length > 0 && {
+              categories: {
+                id: In(query.categoriesId),
+                isDeleted: false,
+              },
+            }),
           isDeleted: false,
         },
         order: {

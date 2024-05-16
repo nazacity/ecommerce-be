@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { PaginationDto } from 'src/utils/pagination'
 
 export class CustomerCreateDto {

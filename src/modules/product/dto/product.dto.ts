@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator'
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator'
 import { ProductCategory } from 'src/modules/product-category/entity/product-category.entity'
 import { ProductImage } from 'src/modules/product-image/entity/product-image.entity'
 import { ProductOptionDto } from 'src/modules/product-option/dto/product-option.dto'
@@ -89,6 +95,11 @@ export class ProductDto {
 }
 
 export class ProductQuery extends PaginationDto {
-  @ApiProperty()
-  categoriesId
+  @ApiProperty({
+    required: false,
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categoriesId?: string[]
 }

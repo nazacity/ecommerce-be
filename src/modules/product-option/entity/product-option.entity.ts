@@ -24,6 +24,9 @@ export class ProductOption extends GlobalEntity {
   @Column()
   price: number
 
+  @Column()
+  cost: number
+
   @ManyToOne(() => Product, (product) => product.productOptions, {
     createForeignKeyConstraints: true,
   })

@@ -9,6 +9,9 @@ export class CustomerAddress extends GlobalEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
+  @Column()
+  name: string
+
   @Column({ type: 'text' })
   address: string
 
