@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Product } from './entity/product.entity'
-import { In, Repository } from 'typeorm'
+import { ILike, In, Repository } from 'typeorm'
 import { paginationUtil } from 'src/utils/pagination'
 import { ProductDto, ProductQuery } from './dto/product.dto'
 
@@ -42,6 +42,7 @@ export class ProductService {
                 isDeleted: false,
               },
             }),
+          ...(query.searchText && { name: ILike(`%${query.searchText}%`) }),
           isDeleted: false,
         },
         order: {

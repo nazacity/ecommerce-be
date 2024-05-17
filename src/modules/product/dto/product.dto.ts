@@ -102,4 +102,9 @@ export class ProductQuery extends PaginationDto {
   @IsArray()
   @IsString({ each: true })
   categoriesId?: string[]
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  searchText?: string
 }

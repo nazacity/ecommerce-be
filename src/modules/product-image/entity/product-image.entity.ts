@@ -9,7 +9,7 @@ export class ProductImage extends GlobalEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column()
+  @Column({ nullable: true })
   imageUrl: string
 
   @ManyToOne(() => Product, (product) => product.images, {

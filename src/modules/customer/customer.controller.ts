@@ -82,7 +82,7 @@ export class CustomerController {
 
   @ApiBearerAuth('Customer Authorization')
   @Patch('/:customerId')
-  async updateob(
+  async updateCustomer(
     @Param('customerId', new ParseUUIDPipe()) customerId: string,
     @Body() customerUpdateDto: CustomerUpdateDto,
   ): Promise<ResponseModel<Customer>> {
