@@ -1,3 +1,4 @@
+import { CustomerAddress } from 'src/modules/customer-address/entities/customer-address.entity'
 import { Customer } from 'src/modules/customer/entities/customer.entity'
 import { OrderItem } from 'src/modules/order-item/entity/order-item.entity'
 import { GlobalEntity } from 'src/utils/global-entity'
@@ -39,14 +40,19 @@ export class Order extends GlobalEntity {
   })
   status: OrderStatus
 
-  @Column()
+  @Column({ default: '', nullable: true })
   trackingNo: string
 
-  @Column()
+  @Column({ default: '', nullable: true })
   trackingCompanyName: string
 
-  @Column()
+  @Column({ default: '', nullable: true })
   transferSlipImageUrl: string
+
+  @ManyToOne(() => Customer, (customer) => customer.orders, {
+    createForeignKeyConstraints: true,
+  })
+  address: CustomerAddress
 
   @ManyToOne(() => Customer, (customer) => customer.orders, {
     createForeignKeyConstraints: true,

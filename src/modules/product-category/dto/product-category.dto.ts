@@ -9,9 +9,12 @@ export class ProductCategoryDto {
   name: string
 
   @ApiProperty()
-  @IsNotEmpty()
   @IsString()
   color: string
+
+  @ApiProperty()
+  @IsString()
+  thumbnailImageUrl: string
 }
 
 export class ProductCategoryQuery extends PaginationDto {}

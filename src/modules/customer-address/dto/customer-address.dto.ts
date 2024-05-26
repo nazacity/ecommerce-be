@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
-import { PaginationDto } from 'src/utils/pagination'
+import { IsNotEmpty, IsString } from 'class-validator'
+import { Customer } from 'src/modules/customer/entities/customer.entity'
 
 export class CustomerAddressDto {
   @ApiProperty()
@@ -37,4 +37,6 @@ export class CustomerAddressDto {
   @IsNotEmpty()
   @IsString()
   zipcode: string
+
+  customer: Customer
 }

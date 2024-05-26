@@ -13,6 +13,12 @@ export class OrderItem extends GlobalEntity {
   @Column()
   quantity: number
 
+  @Column()
+  discount: number
+
+  @Column()
+  total: number
+
   @ManyToOne(() => Order, (order) => order.orderItems, {
     createForeignKeyConstraints: true,
   })

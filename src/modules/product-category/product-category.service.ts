@@ -8,7 +8,7 @@ import {
 } from './dto/product-category.dto'
 import { paginationUtil } from 'src/utils/pagination'
 
-const relations = ['products.categories']
+const relations = ['products.productOptions']
 
 @Injectable()
 export class ProductCategoryService {

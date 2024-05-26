@@ -4,7 +4,7 @@ import { CartItem } from './entity/cart-item.entity'
 import { Repository } from 'typeorm'
 import { CartItemDto } from './dto/cart-item.dto'
 
-const relations = []
+const relations = ['productOption.product', 'productOption.discounts']
 
 @Injectable()
 export class CartItemService {
@@ -19,6 +19,13 @@ export class CartItemService {
     try {
       const customer = await this.cartItemRepository.findOne({
         where: { id: customerId, isDeleted: false },
+        order: {
+          productOption: {
+            discounts: {
+              quantity: 'ASC',
+            },
+          },
+        },
         relations,
       })
 

@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common'
@@ -19,11 +20,16 @@ import { CustomerJwtAuthGuard } from '../auth/guard/customer-auth.guard'
 import { CustomerService } from './customer.service'
 import { Customer } from './entities/customer.entity'
 import { CustomerCreateDto, CustomerUpdateDto } from './dto/customer.dto'
+import { AuthTokenModel } from '../auth/model/auth-token.model'
+import { JwtService } from '@nestjs/jwt'
 
 @ApiTags('Customer')
-@Controller('Customer')
+@Controller('customer')
 export class CustomerController {
-  constructor(private readonly customerService: CustomerService) {}
+  constructor(
+    private readonly customerService: CustomerService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @ApiBearerAuth('Customer Authorization')
   @UseGuards(CustomerJwtAuthGuard)
@@ -62,7 +68,7 @@ export class CustomerController {
   }
 
   @Post()
-  async creatCustomer(
+  async createCustomer(
     @Body() customerCreateDto: CustomerCreateDto,
   ): Promise<ResponseModel<Customer>> {
     try {
@@ -78,6 +84,38 @@ export class CustomerController {
         HttpStatus.BAD_REQUEST,
       )
     }
+  }
+
+  @Put()
+  async putCustomer(@Body() customerCreateDto: CustomerCreateDto): Promise<
+    ResponseModel<{
+      token: AuthTokenModel
+      user: Partial<Customer>
+    }>
+  > {
+    try {
+      const putCustomer =
+        await this.customerService.putCustomer(customerCreateDto)
+
+      const accessToken = await this.getNewToken({
+        id: putCustomer.id,
+      })
+
+      return { data: { token: accessToken, user: putCustomer } }
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+  }
+
+  public async getNewToken(payload: any): Promise<AuthTokenModel> {
+    const accessToken = await this.jwtService.signAsync(payload)
+
+    return { accessToken } as AuthTokenModel
   }
 
   @ApiBearerAuth('Customer Authorization')

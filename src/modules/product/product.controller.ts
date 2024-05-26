@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common'
 import { ProductService } from './product.service'
 import { ProductImageService } from '../product-image/product-image.service'
@@ -24,6 +25,7 @@ import { ResponseModel } from 'src/model/response.model'
 import { Product } from './entity/product.entity'
 import { ProductCategoryService } from '../product-category/product-category.service'
 import { ProductOptionService } from '../product-option/product-option.service'
+import { AdminJwtAuthGuard } from '../auth/guard/admin-auth.guard'
 
 @ApiTags('Product')
 @Controller('product')
@@ -77,6 +79,7 @@ export class ProductController {
   }
 
   @ApiBearerAuth('Admin Authorization')
+  @UseGuards(AdminJwtAuthGuard)
   @Post()
   async creatProduct(
     @Body() productCreateDto: ProductCreateDto,
@@ -125,6 +128,7 @@ export class ProductController {
   }
 
   @ApiBearerAuth('Admin Authorization')
+  @UseGuards(AdminJwtAuthGuard)
   @Patch('/:productId')
   async updateProduct(
     @Param('productId', new ParseUUIDPipe()) productId: string,
@@ -138,11 +142,6 @@ export class ProductController {
           product.images.map((item) => {
             return this.productImageService.deleteProductImage({
               productImageId: item.id,
-            })
-          }),
-          product.productOptions.map((item) => {
-            return this.productOptionService.deleteProductOption({
-              productOptionId: item.id,
             })
           }),
         ])
@@ -164,7 +163,7 @@ export class ProductController {
 
       const productOptions = await Promise.all(
         productUpdateDto.productOptions.map((item) => {
-          return this.productOptionService.createProductOption(item)
+          return this.productOptionService.insertProductOption(item)
         }),
       )
 
@@ -194,6 +193,7 @@ export class ProductController {
   }
 
   @ApiBearerAuth('Admin Authorization')
+  @UseGuards(AdminJwtAuthGuard)
   @Delete('/:productId')
   async deleteProduct(
     @Param('productId', new ParseUUIDPipe()) productId: string,

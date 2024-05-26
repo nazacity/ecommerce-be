@@ -19,6 +19,11 @@ export class ProductService {
       if (!productId) throw new Error('Invalid Product Id')
       const sysLegacyNofication = await this.productRepository.findOne({
         where: { id: productId },
+        order: {
+          productOptions: {
+            index: 'ASC',
+          },
+        },
         relations,
       })
 
@@ -47,6 +52,12 @@ export class ProductService {
         },
         order: {
           createdAt: 'DESC',
+          productOptions: {
+            index: 'ASC',
+            discounts: {
+              quantity: 'ASC',
+            },
+          },
         },
         take,
         skip,

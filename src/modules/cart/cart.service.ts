@@ -3,7 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Cart } from './entity/cart.entity'
 import { Repository } from 'typeorm'
 
-const relations = ['cartItemLists.productOption.product']
+const relations = [
+  'cartItemLists.productOption.product',
+  'cartItemLists.productOption.discounts',
+]
 
 @Injectable()
 export class CartService {
@@ -18,6 +21,11 @@ export class CartService {
     try {
       const cart = await this.cartRepository.findOne({
         where: { id: cartId, isDeleted: false },
+        order: {
+          cartItemLists: {
+            createdAt: 'DESC',
+          },
+        },
         relations,
       })
 

@@ -12,7 +12,11 @@ import { paginationUtil } from 'src/utils/pagination'
 import { CustomerCreditService } from '../customer-credit/customer-credit.service'
 import { CartService } from '../cart/cart.service'
 
-const relations = ['cart', 'credit']
+const relations = [
+  'cart.cartItemLists.productOption.product',
+  'credit.histories',
+  'cart.cartItemLists.productOption.discounts',
+]
 
 @Injectable()
 export class CustomerService {
@@ -98,6 +102,41 @@ export class CustomerService {
       const savedCustomer = await this.customerRepository.save(createdCustomer)
 
       return savedCustomer
+    } catch (error) {
+      this.logger.debug(error)
+      throw new Error(error)
+    }
+  }
+
+  async putCustomer(customerCreateDto: CustomerCreateDto): Promise<Customer> {
+    try {
+      this.logger.log('put-customer')
+
+      const checkedCustomer = await this.getCustomerByLineId(
+        customerCreateDto.lineId,
+      )
+
+      if (checkedCustomer) {
+        const customer = await this.updateCustomer({
+          id: checkedCustomer.id,
+          customerUpdate: customerCreateDto,
+        })
+
+        return this.getCustomerById(customer.id)
+      } else {
+        const cart = await this.cartService.createCart()
+        const credit = await this.customerCreditService.createCustomerCredit()
+
+        const createdCustomer = await this.customerRepository.create({
+          ...customerCreateDto,
+          cart,
+          credit,
+        })
+
+        const savedCustomer =
+          await this.customerRepository.save(createdCustomer)
+        return savedCustomer
+      }
     } catch (error) {
       this.logger.debug(error)
       throw new Error(error)

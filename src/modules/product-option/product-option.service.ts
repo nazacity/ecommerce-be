@@ -65,6 +65,71 @@ export class ProductOptionService {
     }
   }
 
+  async insertProductOption(
+    productOptionProductOptionDto: ProductOptionDto,
+  ): Promise<ProductOption> {
+    try {
+      this.logger.log('insert-product-option')
+
+      if (productOptionProductOptionDto.id) {
+        const productOption = await this.getProductOptionById(
+          productOptionProductOptionDto.id,
+        )
+
+        const discounts = await Promise.all(
+          productOptionProductOptionDto.discounts.map(async (item) => {
+            this.logger.log('create-product-option-discount')
+            if (item.id) {
+              const savedDiscount =
+                await this.productOptionDiscountRepository.save(item)
+
+              return savedDiscount
+            } else {
+              const createdProductDiscount =
+                await this.productOptionDiscountRepository.create({
+                  quantity: item.quantity,
+                  discount: item.discount,
+                })
+              return this.productOptionDiscountRepository.save(
+                createdProductDiscount,
+              )
+            }
+          }),
+        )
+
+        return this.productOptionRepository.save({
+          ...productOption,
+          discounts,
+        })
+      } else {
+        const discounts = await Promise.all(
+          productOptionProductOptionDto.discounts.map(async (item) => {
+            this.logger.log('create-product-option-discount')
+            const createdProductDiscount =
+              await this.productOptionDiscountRepository.create({
+                quantity: item.quantity,
+                discount: item.discount,
+              })
+            return this.productOptionDiscountRepository.save(
+              createdProductDiscount,
+            )
+          }),
+        )
+        const createdProduct = await this.productOptionRepository.create({
+          ...productOptionProductOptionDto,
+          discounts,
+        })
+
+        const savedProduct =
+          await this.productOptionRepository.save(createdProduct)
+
+        return savedProduct
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
   async deleteProductOption({
     productOptionId,
   }: {

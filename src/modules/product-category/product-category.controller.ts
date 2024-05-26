@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common'
 import { ProductCategoryService } from './product-category.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
@@ -19,6 +20,7 @@ import {
   ProductCategoryDto,
   ProductCategoryQuery,
 } from './dto/product-category.dto'
+import { AdminJwtAuthGuard } from '../auth/guard/admin-auth.guard'
 
 @ApiTags('Product Category')
 @Controller('product-category')
@@ -73,6 +75,7 @@ export class ProductCategoryController {
   }
 
   @ApiBearerAuth('Admin Authorization')
+  @UseGuards(AdminJwtAuthGuard)
   @Post()
   async creatProduct(
     @Body() productCategoryDto: ProductCategoryDto,
@@ -95,6 +98,7 @@ export class ProductCategoryController {
   }
 
   @ApiBearerAuth('Admin Authorization')
+  @UseGuards(AdminJwtAuthGuard)
   @Patch('/:productCategoryId')
   async updateProductCategory(
     @Param('productCategoryId', new ParseUUIDPipe()) productCategoryId: string,
@@ -119,6 +123,7 @@ export class ProductCategoryController {
   }
 
   @ApiBearerAuth('Admin Authorization')
+  @UseGuards(AdminJwtAuthGuard)
   @Delete('/:productCategoryId')
   async deleteProduct(
     @Param('productCategoryId', new ParseUUIDPipe()) productCategoryId: string,

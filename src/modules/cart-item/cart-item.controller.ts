@@ -8,7 +8,9 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Put,
   Request,
+  UseGuards,
 } from '@nestjs/common'
 import { CartItemService } from './cart-item.service'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
@@ -17,6 +19,7 @@ import { CartItem } from './entity/cart-item.entity'
 import { CartItemInsertDto } from './dto/cart-item.dto'
 import { RequestClinicUserModel } from 'src/model/request.model'
 import { ProductOptionService } from '../product-option/product-option.service'
+import { CustomerJwtAuthGuard } from '../auth/guard/customer-auth.guard'
 
 @ApiTags('Cart Item')
 @Controller('cart-item')
@@ -27,8 +30,9 @@ export class CartItemController {
   ) {}
 
   @ApiBearerAuth('Customer Authorization')
+  @UseGuards(CustomerJwtAuthGuard)
   @Post()
-  async creatCartItem(
+  async createCartItem(
     @Request() req: RequestClinicUserModel,
     @Body() cartItemInsertDto: CartItemInsertDto,
   ): Promise<ResponseModel<CartItem>> {
@@ -59,6 +63,60 @@ export class CartItemController {
   }
 
   @ApiBearerAuth('Customer Authorization')
+  @UseGuards(CustomerJwtAuthGuard)
+  @Put()
+  async putCartItem(
+    @Request() req: RequestClinicUserModel,
+    @Body() cartItemInsertDto: CartItemInsertDto,
+  ): Promise<ResponseModel<CartItem>> {
+    try {
+      const cart = req.user.cart
+
+      const checkCartItem = req.user.cart.cartItemLists.find(
+        (item) => item.productOption.id === cartItemInsertDto.productOptionId,
+      )
+
+      if (checkCartItem) {
+        const data = {
+          quantity: checkCartItem.quantity + cartItemInsertDto.quantity,
+          cart,
+          productOption: checkCartItem.productOption,
+        }
+
+        const updatedCartItem = await this.cartItemService.updateCartItem({
+          id: checkCartItem.id,
+          data,
+        })
+
+        return { data: updatedCartItem }
+      } else {
+        const productOption =
+          await this.productOptionService.getProductOptionById(
+            cartItemInsertDto.productOptionId,
+          )
+
+        const data = {
+          quantity: cartItemInsertDto.quantity,
+          cart,
+          productOption,
+        }
+
+        const createCartItem = await this.cartItemService.createCartItem(data)
+
+        return { data: createCartItem }
+      }
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+  }
+
+  @ApiBearerAuth('Customer Authorization')
+  @UseGuards(CustomerJwtAuthGuard)
   @Patch('/:cartItemId')
   async updateCartItem(
     @Request() req: RequestClinicUserModel,
@@ -105,6 +163,7 @@ export class CartItemController {
   }
 
   @ApiBearerAuth('Customer Authorization')
+  @UseGuards(CustomerJwtAuthGuard)
   @Delete('/:cartItemId')
   async deleteCustomer(
     @Param('cartItemId', new ParseUUIDPipe()) cartItemId: string,

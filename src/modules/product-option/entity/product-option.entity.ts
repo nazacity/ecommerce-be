@@ -32,6 +32,9 @@ export class ProductOption extends GlobalEntity {
   })
   product: Product
 
+  @Column({ default: 0 })
+  index: number
+
   @OneToMany(
     () => ProductOptionDiscount,
     (productOptionDiscount) => productOptionDiscount.productOption,

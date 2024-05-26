@@ -9,16 +9,6 @@ export class CustomerCreateDto {
   displayName: string
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  firstName: string
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  lastName: string
-
-  @ApiProperty()
   @IsOptional()
   @IsString()
   profileImageUrl: string
@@ -34,16 +24,6 @@ export class CustomerUpdateDto {
   @IsNotEmpty()
   @IsString()
   displayName: string
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  firstName: string
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  lastName: string
 
   @ApiProperty()
   @IsOptional()

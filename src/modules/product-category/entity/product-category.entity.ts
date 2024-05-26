@@ -9,6 +9,9 @@ export class ProductCategory extends GlobalEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
+  @Column({ default: '' })
+  thumbnailImageUrl: string
+
   @Column()
   name: string
 

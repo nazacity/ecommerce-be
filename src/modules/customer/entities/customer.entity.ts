@@ -31,12 +31,6 @@ export class Customer extends GlobalEntity {
   displayName: string
 
   @Column({ nullable: true, default: '' })
-  firstName: string
-
-  @Column({ nullable: true, default: '' })
-  lastName: string
-
-  @Column({ nullable: true, default: '' })
   profileImageUrl: string
 
   @Column({
