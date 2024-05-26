@@ -54,6 +54,8 @@ export class CustomerAddressController {
     }
   }
 
+  @ApiBearerAuth('Customer Authorization')
+  @UseGuards(CustomerJwtAuthGuard)
   @Get('/:userAddressId')
   async getCustomerAddressById(
     @Param('userAddressId', new ParseUUIDPipe()) userAddressId: string,

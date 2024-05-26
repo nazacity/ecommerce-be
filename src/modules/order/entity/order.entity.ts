@@ -15,7 +15,7 @@ export enum OrderStatus {
   'waiting_checking' = 'waiting_checking',
   'waiting_send' = 'waiting_send',
   'sent' = 'sent',
-  'cancaled' = 'cancaled',
+  'canceled' = 'canceled',
 }
 
 @Entity({
@@ -25,6 +25,9 @@ export class Order extends GlobalEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
+  @Column()
+  orderNo: string
+
   @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
   amount: number
 
@@ -33,6 +36,9 @@ export class Order extends GlobalEntity {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
   total: number
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
+  shippingFee: number
 
   @Column({
     enum: OrderStatus,
@@ -52,15 +58,31 @@ export class Order extends GlobalEntity {
   @ManyToOne(() => Customer, (customer) => customer.orders, {
     createForeignKeyConstraints: true,
   })
-  address: CustomerAddress
-
-  @ManyToOne(() => Customer, (customer) => customer.orders, {
-    createForeignKeyConstraints: true,
-  })
   customer: Customer
 
   @OneToMany(() => OrderItem, (OrderItem) => OrderItem.order, {
     createForeignKeyConstraints: false,
   })
   orderItems: OrderItem[]
+
+  @Column()
+  name: string
+
+  @Column({ type: 'text' })
+  address: string
+
+  @Column()
+  subDistrict: string
+
+  @Column()
+  district: string
+
+  @Column()
+  province: string
+
+  @Column()
+  telephone: string
+
+  @Column()
+  zipcode: string
 }

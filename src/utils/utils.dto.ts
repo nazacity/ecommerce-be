@@ -1,17 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsDateString } from 'class-validator'
+import { IsDateString, IsOptional } from 'class-validator'
 import { PaginationDto } from './pagination'
 
 export class DateRangeDto extends PaginationDto {
   @ApiProperty({
     default: new Date(),
   })
+  @IsOptional()
   @IsDateString()
-  from: string
+  from?: string
 
   @ApiProperty({
     default: new Date(),
   })
+  @IsOptional()
   @IsDateString()
-  to: string
+  to?: string
 }
