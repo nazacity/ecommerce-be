@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   Request,
@@ -21,6 +22,9 @@ import {
   OrderDto,
   OrderQueryByUserDto,
   OrderQueryDto,
+  OrderUpdateShippingInformationDto,
+  OrderUpdateStatusDto,
+  OrderUpdateTransferSlipImageUrlDto,
 } from './dto/order.dto'
 import { RequestClinicUserModel } from 'src/model/request.model'
 import { ResponseModel } from 'src/model/response.model'
@@ -156,19 +160,13 @@ export class OrderController {
           }),
       )
 
-      console.log(orderItems)
-
       const amount = orderItems.reduce((previousValue, item) => {
         return previousValue + item.productOption.price * item.quantity
       }, 0)
 
-      console.log(amount)
-
       const discount = orderItems.reduce((previousValue, item) => {
         return previousValue + item.discount
       }, 0)
-
-      console.log(discount)
 
       const total = amount - discount + parseFloat(Math.random().toFixed(2))
 
@@ -216,6 +214,102 @@ export class OrderController {
       )
 
       return { data: order }
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+  }
+
+  @ApiBearerAuth('Admin Authorization')
+  @UseGuards(AdminJwtAuthGuard)
+  @Patch('/update-shipping-info/:orderId')
+  async updateOrderShippingInformation(
+    @Param('orderId', new ParseUUIDPipe()) orderId: string,
+    @Body() orderUpdateDto: OrderUpdateShippingInformationDto,
+  ): Promise<ResponseModel<Order>> {
+    try {
+      const updatedOrder =
+        await this.orderService.updateOrderShippingInformation({
+          orderId,
+          orderUpdateDto,
+        })
+
+      return { data: updatedOrder }
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+  }
+
+  @ApiBearerAuth('Admin Authorization')
+  @UseGuards(AdminJwtAuthGuard)
+  @Patch('/update-status/:orderId')
+  async updateOrderStatus(
+    @Param('orderId', new ParseUUIDPipe()) orderId: string,
+    @Body() orderUpdateDto: OrderUpdateStatusDto,
+  ): Promise<ResponseModel<Order>> {
+    try {
+      const updatedOrder = await this.orderService.updateOrderStatus({
+        orderId,
+        orderUpdateDto,
+      })
+
+      return { data: updatedOrder }
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+  }
+
+  @ApiBearerAuth('Customer Authorization')
+  @UseGuards(CustomerJwtAuthGuard)
+  @Patch('/update-shipping-info/:orderId')
+  async updateOrderTransferSlipImageUrl(
+    @Param('orderId', new ParseUUIDPipe()) orderId: string,
+    @Body() orderUpdateDto: OrderUpdateTransferSlipImageUrlDto,
+  ): Promise<ResponseModel<Order>> {
+    try {
+      const updatedOrder =
+        await this.orderService.updateOrderTransferSlipImageUrl({
+          orderId,
+          orderUpdateDto,
+        })
+
+      return { data: updatedOrder }
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+  }
+
+  @ApiBearerAuth('Customer Authorization')
+  @UseGuards(CustomerJwtAuthGuard)
+  @Patch('/update-cancel/:orderId')
+  async updateOrderStatusCancel(
+    @Param('orderId', new ParseUUIDPipe()) orderId: string,
+  ): Promise<ResponseModel<Order>> {
+    try {
+      const updatedOrder = await this.orderService.updateOrdeStatusCancel({
+        orderId,
+      })
+
+      return { data: updatedOrder }
     } catch (error) {
       throw new HttpException(
         {

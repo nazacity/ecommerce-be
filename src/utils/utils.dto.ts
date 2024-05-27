@@ -5,6 +5,7 @@ import { PaginationDto } from './pagination'
 export class DateRangeDto extends PaginationDto {
   @ApiProperty({
     default: new Date(),
+    required: false,
   })
   @IsOptional()
   @IsDateString()
@@ -12,6 +13,7 @@ export class DateRangeDto extends PaginationDto {
 
   @ApiProperty({
     default: new Date(),
+    required: false,
   })
   @IsOptional()
   @IsDateString()

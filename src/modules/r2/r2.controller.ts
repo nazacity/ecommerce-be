@@ -33,10 +33,10 @@ export class R2Controller {
   async uploadImage(
     @UploadedFile() image: Express.Multer.File,
   ): Promise<ResponseModel<ResourceUrl>> {
-    // const data = await this.r2Service.uploadImage(image)
+    const data = await this.r2Service.uploadImage(image)
 
     return {
-      data: null,
+      data,
     }
   }
 

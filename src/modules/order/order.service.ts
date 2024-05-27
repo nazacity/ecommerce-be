@@ -1,12 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Order } from './entity/order.entity'
+import { Order, OrderStatus } from './entity/order.entity'
 import { Between, Repository } from 'typeorm'
 import {
   OrderDto,
   OrderQueryByDateDto,
   OrderQueryByUserDto,
   OrderQueryDto,
+  OrderUpdateShippingInformationDto,
+  OrderUpdateStatusDto,
+  OrderUpdateTransferSlipImageUrlDto,
 } from './dto/order.dto'
 import { paginationUtil } from 'src/utils/pagination'
 
@@ -132,6 +135,84 @@ export class OrderService {
       const savedOrder = await this.orderRepository.save(createdOrder)
 
       return savedOrder
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async updateOrderShippingInformation({
+    orderId,
+    orderUpdateDto,
+  }: {
+    orderId: string
+    orderUpdateDto: OrderUpdateShippingInformationDto
+  }): Promise<Order> {
+    try {
+      this.logger.log('update-order-shipping-information')
+
+      await this.orderRepository.update(orderId, {
+        ...orderUpdateDto,
+        status: OrderStatus.sent,
+      })
+
+      return this.getOrderById(orderId)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async updateOrderTransferSlipImageUrl({
+    orderId,
+    orderUpdateDto,
+  }: {
+    orderId: string
+    orderUpdateDto: OrderUpdateTransferSlipImageUrlDto
+  }): Promise<Order> {
+    try {
+      this.logger.log('update-order-transfer-slip-image-url')
+
+      await this.orderRepository.update(orderId, {
+        ...orderUpdateDto,
+        status: OrderStatus.waiting_checking,
+      })
+
+      return this.getOrderById(orderId)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async updateOrderStatus({
+    orderId,
+    orderUpdateDto,
+  }: {
+    orderId: string
+    orderUpdateDto: OrderUpdateStatusDto
+  }): Promise<Order> {
+    try {
+      this.logger.log('update-order-status')
+
+      await this.orderRepository.update(orderId, orderUpdateDto)
+
+      return this.getOrderById(orderId)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async updateOrdeStatusCancel({
+    orderId,
+  }: {
+    orderId: string
+  }): Promise<Order> {
+    try {
+      this.logger.log('update-order-transfer-slip-image-url')
+
+      await this.orderRepository.update(orderId, {
+        status: OrderStatus.canceled,
+      })
+
+      return this.getOrderById(orderId)
     } catch (error) {
       throw error
     }

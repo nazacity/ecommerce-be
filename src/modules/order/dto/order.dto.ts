@@ -71,6 +71,16 @@ export class OrderUpdateTransferSlipImageUrlDto {
   transferSlipImageUrl: string
 }
 
+export class OrderUpdateStatusDto {
+  @ApiProperty({
+    type: 'enum',
+    enum: OrderStatus,
+    required: false,
+  })
+  @IsEnum(OrderStatus)
+  status: OrderStatus
+}
+
 export class OrderQueryDto extends DateRangeDto {
   @ApiProperty({
     type: 'enum',

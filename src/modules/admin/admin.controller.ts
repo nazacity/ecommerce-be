@@ -4,10 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Param,
-  ParseUUIDPipe,
   Post,
-  Query,
   Request,
   UseGuards,
 } from '@nestjs/common'
