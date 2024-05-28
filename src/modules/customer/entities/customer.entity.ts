@@ -33,6 +33,9 @@ export class Customer extends GlobalEntity {
   @Column({ nullable: true, default: '' })
   profileImageUrl: string
 
+  @Column({ unique: true })
+  recommentorCode: string
+
   @Column({
     default: CustomerStatus.active,
     type: 'enum',

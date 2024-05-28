@@ -42,6 +42,7 @@ export class AuthController {
       const accessToken = await this.authService.getNewToken({
         id: customer.id,
       })
+
       return {
         data: { token: accessToken, user: customer },
       }
@@ -61,9 +62,10 @@ export class AuthController {
   ): Promise<ResponseModel<{ token: AuthTokenModel; user: Partial<Admin> }>> {
     try {
       adminLoginDto.username = adminLoginDto.username.toLowerCase()
-      const admin = await this.administorService.getAdminByUsernameAndPassword(
-        adminLoginDto,
-      )
+      const admin =
+        await this.administorService.getAdminByUsernameAndPassword(
+          adminLoginDto,
+        )
 
       const accessToken = await this.authService.getNewToken({
         id: admin.id,

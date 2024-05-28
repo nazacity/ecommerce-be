@@ -28,16 +28,19 @@ export class Order extends GlobalEntity {
   @Column()
   orderNo: string
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.0' })
   amount: number
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.0' })
   discount: number
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.0' })
   total: number
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.0' })
+  creditAmount: number
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.0' })
   shippingFee: number
 
   @Column({
@@ -85,4 +88,7 @@ export class Order extends GlobalEntity {
 
   @Column()
   zipcode: string
+
+  @Column({ nullable: true, default: '' })
+  recommentorCode: string
 }

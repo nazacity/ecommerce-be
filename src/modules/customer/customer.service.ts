@@ -16,7 +16,11 @@ const relations = [
   'cart.cartItemLists.productOption.product',
   'credit.histories',
   'cart.cartItemLists.productOption.discounts',
+  'addresses',
 ]
+
+const characters =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
 @Injectable()
 export class CustomerService {
@@ -69,6 +73,23 @@ export class CustomerService {
     }
   }
 
+  async getCustomerByRecommentorCode(
+    recommentorCode: string,
+  ): Promise<Customer> {
+    this.logger.log('get-customer-by-recommentor-code')
+    try {
+      const customer = await this.customerRepository.findOne({
+        where: { recommentorCode, isDeleted: false },
+        relations,
+      })
+
+      return customer
+    } catch (error) {
+      this.logger.debug(error)
+      throw new Error(error)
+    }
+  }
+
   async getCustomerByLineId(lineId: string): Promise<Customer> {
     this.logger.log('get-customer-by-line-id')
     try {
@@ -108,6 +129,16 @@ export class CustomerService {
     }
   }
 
+  generateString(length: number) {
+    let result = ' '
+    const charactersLength = characters.length
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    }
+
+    return result
+  }
+
   async putCustomer(customerCreateDto: CustomerCreateDto): Promise<Customer> {
     try {
       this.logger.log('put-customer')
@@ -127,10 +158,29 @@ export class CustomerService {
         const cart = await this.cartService.createCart()
         const credit = await this.customerCreditService.createCustomerCredit()
 
+        let recommentorCode = this.generateString(6)
+        let isUnique = false
+
+        while (!isUnique) {
+          const customer = await this.customerRepository.findOne({
+            where: {
+              recommentorCode,
+              isDeleted: false,
+            },
+          })
+
+          if (!customer) {
+            isUnique = true
+          } else {
+            recommentorCode = this.generateString(6)
+          }
+        }
+
         const createdCustomer = await this.customerRepository.create({
           ...customerCreateDto,
           cart,
           credit,
+          recommentorCode,
         })
 
         const savedCustomer =

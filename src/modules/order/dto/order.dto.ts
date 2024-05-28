@@ -18,6 +18,7 @@ export class OrderDto {
   amount: number
   discount: number
   total: number
+  creditAmount: number
   status: OrderStatus
   trackingNo: string
   trackingCompanyName: string
@@ -32,6 +33,7 @@ export class OrderDto {
   customer: Customer
   orderItems: OrderItem[]
   shippingFee: number
+  recommentorCode: string
 }
 
 export class OrderCreateDto {
@@ -45,6 +47,15 @@ export class OrderCreateDto {
   @IsArray()
   @IsString({ each: true })
   cartItemIds: string[]
+
+  @ApiProperty()
+  @IsString()
+  recommentorCode: string
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumberString()
+  creditAmount: number
 }
 
 export class OrderUpdateShippingInformationDto {

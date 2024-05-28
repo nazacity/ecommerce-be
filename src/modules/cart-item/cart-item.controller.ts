@@ -77,18 +77,27 @@ export class CartItemController {
       )
 
       if (checkCartItem) {
-        const data = {
-          quantity: checkCartItem.quantity + cartItemInsertDto.quantity,
-          cart,
-          productOption: checkCartItem.productOption,
+        const quantity = checkCartItem.quantity + cartItemInsertDto.quantity
+        if (quantity < 1) {
+          await this.cartItemService.deleteCartItem({
+            cartItemId: checkCartItem.id,
+          })
+
+          return null
+        } else {
+          const data = {
+            quantity: checkCartItem.quantity + cartItemInsertDto.quantity,
+            cart,
+            productOption: checkCartItem.productOption,
+          }
+
+          const updatedCartItem = await this.cartItemService.updateCartItem({
+            id: checkCartItem.id,
+            data,
+          })
+
+          return { data: updatedCartItem }
         }
-
-        const updatedCartItem = await this.cartItemService.updateCartItem({
-          id: checkCartItem.id,
-          data,
-        })
-
-        return { data: updatedCartItem }
       } else {
         const productOption =
           await this.productOptionService.getProductOptionById(

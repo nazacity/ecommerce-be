@@ -67,6 +67,34 @@ export class CustomerController {
     }
   }
 
+  @ApiBearerAuth('Customer Authorization')
+  @UseGuards(CustomerJwtAuthGuard)
+  @Get('/check-customer-by-recommentor-code/:recommentorCode')
+  async getCheckCustomerByRecommentorCode(
+    @Request() req: RequestClinicUserModel,
+    @Param('recommentorCode') recommentorCode: string,
+  ): Promise<ResponseModel<boolean>> {
+    try {
+      if (req.user.recommentorCode === recommentorCode) {
+        return {
+          data: false,
+        }
+      }
+
+      const customer =
+        await this.customerService.getCustomerByRecommentorCode(recommentorCode)
+
+      return { data: !!customer }
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      )
+    }
+  }
+
   @Post()
   async createCustomer(
     @Body() customerCreateDto: CustomerCreateDto,

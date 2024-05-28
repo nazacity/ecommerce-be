@@ -34,6 +34,15 @@ import { OrderItemDto } from '../order-item/dto/order-item.dto'
 import * as _ from 'lodash'
 import * as dayjs from 'dayjs'
 import { AdminJwtAuthGuard } from '../auth/guard/admin-auth.guard'
+import { CustomerCreditService } from '../customer-credit/customer-credit.service'
+import { CustomerCreditHistoryService } from '../customer-credit-history/customer-credit-history.service'
+import { CustomerCreateHistoryDto } from '../customer-credit-history/dto/customer-credit-history.dto'
+import { CustomerCreditHistoryType } from '../customer-credit-history/entity/customer-credit-history.entity'
+
+const configOrder = {
+  minTotal: 3000,
+  percentageCredit: 0.05,
+}
 
 @ApiTags('Order')
 @Controller('order')
@@ -41,6 +50,8 @@ export class OrderController {
   constructor(
     private readonly orderService: OrderService,
     private readonly customerAddressService: CustomerAddressService,
+    private readonly customerCreditService: CustomerCreditService,
+    private readonly customerCreditHistoryService: CustomerCreditHistoryService,
     private readonly orderItemService: OrderItemService,
     private readonly cartItemService: CartItemService,
   ) {}
@@ -160,15 +171,25 @@ export class OrderController {
           }),
       )
 
+      const creditAmount =
+        orderCreateDto.creditAmount > req.user.credit.amount
+          ? req.user.credit.amount
+          : orderCreateDto.creditAmount
+
       const amount = orderItems.reduce((previousValue, item) => {
         return previousValue + item.productOption.price * item.quantity
       }, 0)
 
-      const discount = orderItems.reduce((previousValue, item) => {
+      let discount = orderItems.reduce((previousValue, item) => {
         return previousValue + item.discount
       }, 0)
 
-      const total = amount - discount + parseFloat(Math.random().toFixed(2))
+      if (amount > configOrder.minTotal) {
+        discount += (amount - discount) * configOrder.percentageCredit
+      }
+
+      const total =
+        amount - discount - creditAmount + parseFloat(Math.random().toFixed(2))
 
       const { total: ordersTotal } = await this.orderService.getOrderByDate({
         date: dayjs().toDate(),
@@ -189,6 +210,7 @@ export class OrderController {
         amount,
         discount,
         total,
+        creditAmount,
         status: OrderStatus.waiting_payment,
         trackingNo: '',
         trackingCompanyName: '',
@@ -203,6 +225,7 @@ export class OrderController {
         customer: req.user,
         orderItems,
         shippingFee: 0.0,
+        recommentorCode: orderCreateDto.recommentorCode,
       }
 
       const order = await this.orderService.createOrder(data)
@@ -212,6 +235,24 @@ export class OrderController {
           return this.cartItemService.deleteCartItem({ cartItemId: item.id })
         }),
       )
+
+      const createHistoryData: CustomerCreateHistoryDto = {
+        amount: creditAmount,
+        description: `ชำระ Order No ${order.orderNo} จำนวน ${creditAmount} credit`,
+        type: CustomerCreditHistoryType.decrease,
+        customerCredit: req.user.credit,
+      }
+
+      await this.customerCreditHistoryService.createCustomerCreditHistory(
+        createHistoryData,
+      )
+
+      const amount2 = req.user.credit.amount - creditAmount
+
+      await this.customerCreditService.updateCustomerCredit({
+        creditId: req.user.credit.id,
+        amount: amount2,
+      })
 
       return { data: order }
     } catch (error) {
@@ -237,6 +278,35 @@ export class OrderController {
           orderId,
           orderUpdateDto,
         })
+
+      const amount = updatedOrder.total + updatedOrder.creditAmount
+
+      if (amount >= configOrder.minTotal) {
+        const customerCredit =
+          await this.customerCreditService.getCustomerCreditByRecommentorCode(
+            updatedOrder.recommentorCode,
+          )
+
+        const creditAmount = updatedOrder.total * configOrder.percentageCredit
+
+        const createHistoryData: CustomerCreateHistoryDto = {
+          amount: creditAmount,
+          description: `ได้รับเครดิตจาก Order No ${updatedOrder.orderNo} จำนวน ${creditAmount} credit`,
+          type: CustomerCreditHistoryType.increase,
+          customerCredit,
+        }
+
+        await this.customerCreditHistoryService.createCustomerCreditHistory(
+          createHistoryData,
+        )
+
+        const amount2 = customerCredit.amount + createHistoryData.amount
+
+        await this.customerCreditService.updateCustomerCredit({
+          creditId: customerCredit.id,
+          amount: amount2,
+        })
+      }
 
       return { data: updatedOrder }
     } catch (error) {

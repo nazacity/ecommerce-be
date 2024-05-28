@@ -16,7 +16,7 @@ export class CustomerCreditHistoryService {
     customerCreateHistoryDto: CustomerCreateHistoryDto,
   ): Promise<CustomerCreditHistory> {
     try {
-      this.logger.log('create-customer-credit')
+      this.logger.log('create-customer-credit-history')
 
       const createdCustomerCreditHistory =
         await this.customerCreditHistoryRepository.create(
